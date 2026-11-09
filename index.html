@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noor Quran</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #06251C;
+  --green: #10543C;
+  --gold: #D9B45B;
+  --cream: #F5EBD2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--cream);
+  font-family: Georgia, serif;
+}
+
+header {
+  text-align: center;
+  padding: 35px 15px;
+  background: linear-gradient(135deg, #10543C, #06251C);
+  border-bottom: 2px solid var(--gold);
+}
+
+.logo {
+  color: var(--gold);
+  font-size: 48px;
+}
+
+h1 {
+  color: var(--gold);
+  letter-spacing: 3px;
+}
+
+.subtitle { color: var(--cream); }
+
+nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 15px 8px;
+  background: #0A3428;
+}
+
+nav button {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid var(--gold);
+}
+
+nav button.active {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+main {
+  max-width: 850px;
+  margin: auto;
+  padding: 15px;
+}
+
+.card {
+  background: linear-gradient(145deg, #10543C, #0A3428);
+  border: 1px solid var(--gold);
+  border-radius: 17px;
+  padding: 20px;
+  margin: 17px 0;
+  box-shadow: 0 7px 22px #00000030;
+}
+
+h2, h3 { color: var(--gold); }
+
+button {
+  background: linear-gradient(135deg, #E8CA79, #C99D43);
+  color: #06251C;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 17px;
+  margin: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+select {
+  width: 100%;
+  padding: 13px;
+  border-radius: 9px;
+  background: var(--cream);
+  color: var(--bg);
+  margin: 10px 0;
+}
+
+.arabic {
+  font-family: 'Amiri', serif;
+  font-size: 32px;
+  line-height: 2.1;
+  text-align: right;
+  direction: rtl;
+  color: var(--cream);
+}
+
+.translation {
+  color: #E8CA79;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.ayah {
+  border: 1px solid #60836A;
+  border-radius: 14px;
+  padding: 18px;
+  margin: 15px 0;
+}
+
+.ayah-number {
+  color: var(--gold);
+  font-size: 13px;
+}
+
+.small {
+  color: #C4D7C8;
+  font-size: 13px;
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+#status {
+  text-align: center;
+  color: var(--gold);
+  padding: 15px;
+}
+
+audio { width: 100%; margin-top: 12px; }
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: var(--gold);
+}
+
+@media(max-width: 500px) {
+  .arabic { font-size: 28px; }
+  nav button { padding: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">☪</div>
+  <h1>NOOR QURAN</h1>
+  <p class="subtitle">Your daily connection with the Quran</p>
+  <p class="small">نور القرآن</p>
+</header>
+
+<nav>
+  <button class="active" data-page="home">Home</button>
+  <button data-page="reader">Quran</button>
+  <button data-page="bookmarks">Bookmarks</button>
+  <button data-page="daily">Daily Ayah</button>
+</nav>
+
+<main>
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+  <div class="card">
+    <h2>السلام عليكم</h2>
+    <p>Welcome to Noor Quran</p>
+    <p>Read, listen and connect with the Quran.</p>
+    <button onclick="showPage('reader')">Read Quran</button>
+  </div>
+
+  <div class="card">
+    <h2>📖 Continue Reading</h2>
+    <p id="lastReading">You haven't started reading yet.</p>
+    <button onclick="continueReading()">Continue</button>
+  </div>
+
+  <div class="card">
+    <h2>🌙 Daily Ayah</h2>
+    <p>Take a moment to reflect on the words of Allah.</p>
+    <button onclick="showPage('daily')">Read Today's Ayah</button>
+  </div>
+
+  <div class="card">
+    <h2>📿 Digital Tasbih</h2>
+    <div id="count" style="font-size:42px;color:#D9B45B">0</div>
+    <button onclick="addCount()">Count</button>
+    <button onclick="resetCount()">Reset</button>
+  </div>
+
+</section>
+
+<!-- QURAN READER -->
+<section id="reader" class="page">
+
+  <div class="card">
+    <h2>📖 The Holy Quran</h2>
+    <p>Select a Surah to begin reading.</p>
+
+    <select id="surahSelect">
+      <option>Loading Surahs...</option>
+    </select>
+
+    <button onclick="loadSurah()">Open Surah</button>
+    <div id="status"></div>
+  </div>
+
+  <div id="surahInfo"></div>
+  <div id="verses"></div>
+
+</section>
+
+<!-- BOOKMARKS -->
+<section id="bookmarks" class="page">
+
+  <div class="card">
+    <h2>🔖 My Bookmarks</h2>
+    <p>Saved verses will appear here.</p>
+    <div id="bookmarkList"></div>
+  </div>
+
+</section>
+
+<!-- DAILY AYAH -->
+<section id="daily" class="page">
+
+  <div class="card">
+    <h2>🌙 Ayah of the Day</h2>
+    <p class="small">A daily moment with the Quran.</p>
+    <div id="dailyContent">Loading today's verse...</div>
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  <p>NOOR QURAN ☪</p>
+  <p class="small">Made with care for the love of the Quran.</p>
+</footer>
+
+<script>
+const API = "https://api.alquran.cloud/v1";
+
+let surahs = [];
+let currentSurah = 1;
+let lastAyah = 1;
+let tasbih = 0;
+
+let bookmarks = JSON.parse(
+  localStorage.getItem("noorBookmarks") || "[]"
+);
+
+const savedProgress = JSON.parse(
+  localStorage.getItem("noorProgress") || "null"
+);
+
+// NAVIGATION
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p => {
+    p.classList.remove("active");
+  });
+
+  document.getElementById(name).classList.add("active");
+
+  document.querySelectorAll("nav button").forEach(b => {
+    b.classList.toggle("active", b.dataset.page === name);
+  });
+
+  if (name === "bookmarks") renderBookmarks();
+  if (name === "daily") loadDaily();
+}
+
+// NAV BUTTONS
+document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    showPage(button.dataset.page);
+  });
+});
+
+// LOAD ALL 114 SURAHS
+async function loadSurahList() {
+  const select = document.getElementById("surahSelect");
+
+  try {
+    const response = await fetch(API + "/surah");
+    const result = await response.json();
+
+    if (result.code !== 200) throw new Error("API error");
+
+    surahs = result.data;
+
+    select.innerHTML = "";
+
+    surahs.forEach(surah => {
+      const option = document.createElement("option");
+      option.value = surah.number;
+      option.textContent =
+        surah.number + ". " + surah.englishName +
+        " - " + surah.name;
+
+      select.appendChild(option);
+    });
+
+    select.value = savedProgress?.surah || 1;
+
+  } catch (error) {
+    select.innerHTML = "<option>Could not load Surahs</option>";
+    document.getElementById("status").textContent =
+      "Please check your internet connection and refresh.";
+  }
+}
+
+// LOAD A SURAH
+async function loadSurah(number, startAyah = 1) {
+  const select = document.getElementById("surahSelect");
+
+  if (!number) number = Number(select.value);
+
+  if (!number || number < 1 || number > 114) return;
+
+  currentSurah = Number(number);
+
+  document.getElementById("surahInfo").textContent = "";
+  document.getElementById("verses").textContent = "";
+  document.getElementById("status").textContent = "Loading Quran...";
+
+  showPage("reader");
+
+  try {
+    const response = await fetch(
+      `${API}/surah/${currentSurah}/editions/quran-uthmani,en.sahih,ar.alafasy`
+    );
+
+    const result = await response.json();
+
+    if (result.code !== 200 || result.data.length !== 3) {
+      throw new Error("Could not load editions");
+    }
+
+    const arabic = result.data[0];
+    const english = result.data[1];
+    const audio = result.data[2];
+
+    document.getElementById("status").textContent = "";
+
+    const info = document.getElementById("surahInfo");
+    info.innerHTML = "";
+
+    const heading = document.createElement("div");
+    heading.className = "card";
+    heading.innerHTML =
+      "<h2>" + arabic.englishName + "</h2>" +
+      "<p>" + arabic.name + "</p>" +
+      "<p class='small'>" + arabic.englishNameTranslation +
+      " · " + arabic.numberOfAyahs + " Ayahs</p>";
+
+    info.appendChild(heading);
+
+    const container = document.getElementById("verses");
+    container.innerHTML = "";
+
+    arabic.ayahs.forEach((verse, index) => {
+      const englishVerse = english.ayahs[index];
+      const audioVerse = audio.ayahs[index];
+
+      const box = document.createElement("div");
+      box.className = "ayah";
+
+      const number = document.createElement("p");
+      number.className = "ayah-number";
+      number.textContent = "AYAH " + verse.numberInSurah;
+
+      const arabicText = document.createElement("p");
+      arabicText.className = "arabic";
+      arabicText.textContent = verse.text;
+
+      const translation = document.createElement("p");
+      translation.className = "translation";
+      translation.textContent = englishVerse.text;
+
+      const audioPlayer = document.createElement("audio");
+      audioPlayer.controls = true;
+      audioPlayer.preload = "none";
+      audioPlayer.src = audioVerse.audio;
+
+      const bookmarkButton = document.createElement("button");
+      bookmarkButton.textContent = "🔖 Save Ayah";
+
+      bookmarkButton.onclick = () => {
+        saveBookmark(
+          currentSurah,
+          verse.numberInSurah,
+          verse.text,
+          englishVerse.text
+        );
+      };
+
+      box.append(number, arabicText, translation, audioPlayer, bookmarkButton);
+
+      container.appendChild(box);
+    });
+
+    lastAyah = startAyah;
+
+    localStorage.setItem("noorProgress", JSON.stringify({
+      surah: currentSurah,
+      ayah: startAyah
+    }));
+
+    document.getElementById("verses").scrollIntoView({
+      behavior: "smooth"
+    });
+
+    updateLastReading();
+
+    if (startAyah > 1) {
+      const target = container.children[startAyah - 1];
+
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+  } catch (error) {
+    document.getElementById("status").textContent =
+      "Could not load Quran. Check your internet and try again.";
+  }
+}
+
+// SAVE BOOKMARK
+function saveBookmark(surah, ayah, arabic, translation) {
+  const exists = bookmarks.some(b =>
+    b.surah === surah && b.ayah === ayah
+  );
+
+  if (exists) {
+    alert("This Ayah is already bookmarked.");
+    return;
+  }
+
+  bookmarks.push({
+    surah,
+    ayah,
+    arabic,
+    translation
+  });
+
+  localStorage.setItem(
+    "noorBookmarks",
+    JSON.stringify(bookmarks)
+  );
+
+  alert("Ayah saved successfully!");
+}
+
+// SHOW BOOKMARKS
+function renderBookmarks() {
+  const list = document.getElementById("bookmarkList");
+  list.innerHTML = "";
+
+  if (bookmarks.length === 0) {
+    list.textContent = "No saved Ayahs yet.";
+    return;
+  }
+
+  bookmarks.forEach((b, index) => {
+    const box = document.createElement("div");
+    box.className = "ayah";
+
+    const title = document.createElement("h3");
+    title.textContent = "Surah " + b.surah + " · Ayah " + b.ayah;
+
+    const arabic = document.createElement("p");
+    arabic.className = "arabic";
+    arabic.textContent = b.arabic;
+
+    const translation = document.createElement("p");
+    translation.className = "translation";
+    translation.textContent = b.translation;
+
+    const open = document.createElement("button");
+    open.textContent = "Open Ayah";
+    open.onclick = () => loadSurah(b.surah, b.ayah);
+
+    const remove = document.createElement("button");
+    remove.textContent = "Remove";
+    remove.onclick = () => {
+      bookmarks.splice(index, 1);
+      localStorage.setItem(
+        "noorBookmarks",
+        JSON.stringify(bookmarks)
+      );
+      renderBookmarks();
+    };
+
+    box.append(title, arabic, translation, open, remove);
+    list.appendChild(box);
+  });
+}
+
+// READING PROGRESS
+function updateLastReading() {
+  const label = document.getElementById("lastReading");
+
+  if (savedProgress) {
+    label.textContent =
+      "Your last saved reading was Surah " +
+      savedProgress.surah + ", Ayah " +
+      savedProgress.ayah + ".";
+  }
+}
+
+function continueReading() {
+  const progress = JSON.parse(
+    localStorage.getItem("noorProgress") || "null"
+  );
+
+  if (progress) {
+    loadSurah(progress.surah, progress.ayah);
+  } else {
+    loadSurah(1);
+  }
+}
+
+// DAILY AYAH
+async function loadDaily() {
+  const output = document.getElementById("dailyContent");
+
+  if (output.dataset.loaded === "yes") return;
+
+  output.textContent = "Loading today's Ayah...";
+
+  try {
+    const day = Math.floor(
+      new Date().setHours(0,0,0,0) / 86400000
+    );
+
+    const verseNumber = (day % 6236) + 1;
+
+    const response = await fetch(
+      `${API}/ayah/${verseNumber}/editions/quran-uthmani,en.sahih`
+    );
+
+    const result = await response.json();
+
+    if (result.code !== 200) throw new Error("API error");
+
+    const arabic = result.data[0];
+    const english = result.data[1];
+
+    output.innerHTML = "";
+
+    const arabicText = document.createElement("p");
+    arabicText.className = "arabic";
+    arabicText.textContent = arabic.text;
+
+    const translation = document.createElement("p");
+    translation.className = "translation";
+    translation.textContent = english.text;
+
+    const reference = document.createElement("p");
+    reference.className = "small";
+    reference.textContent =
+      "Surah " + arabic.surah.englishName +
+      " · Ayah " + arabic.numberInSurah;
+
+    output.append(arabicText, translation, reference);
+
+    output.dataset.loaded = "yes";
+
+  } catch (error) {
+    output.textContent =
+      "Could not load today's Ayah. Please try again.";
+  }
+}
+
+// TASBIH
+function addCount() {
+  tasbih++;
+  document.getElementById("count").textContent = tasbih;
+}
+
+function resetCount() {
+  tasbih = 0;
+  document.getElementById("count").textContent = 0;
+}
+
+// START
+loadSurahList();
+updateLastReading();
+</script>
+
+</body>
+</html>
+
